@@ -3,6 +3,8 @@ name: MF CI Build
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   build:
@@ -16,12 +18,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
       - name: Install deps
-        run: npm install
+        run: npm ci
 
       - name: Build project
         run: npm run build
 
+      - name: Verify MF remoteEntry
+        run: ls dist/remoteEntry.js
+
       - name: Build Docker image
-        run: docker build -t mf-app1 .
+        run: docker build -t mf-app1:${{ github.sha }} .
